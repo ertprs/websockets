@@ -9,14 +9,16 @@ const io = socketio(server);
 
 app.use(express.static(path.join(__dirname, "../public")));
 
-let count = 0;
+let message = "Welcome";
 
 io.on("connection", (socket) => {
-  console.log("new web server connection");
-  socket.emit("updateCount", count);
-  socket.on("increment", () => {
-    count++;
-    io.emit("updateCount", count);
+  socket.emit("Message", message);
+  socket.broadcast.emit("Message", "A new user has joined the chat");
+  socket.on("text", (text) => {
+    io.emit("newMessage", text);
+  });
+  socket.on("disconnect", () => {
+    io.emit("Message", "A user has left the chat");
   });
 });
 
