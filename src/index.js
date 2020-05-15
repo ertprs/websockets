@@ -14,15 +14,17 @@ let message = "Welcome";
 io.on("connection", (socket) => {
   socket.emit("Message", message);
   socket.broadcast.emit("Message", "A new user has joined the chat");
-  socket.on("text", (text) => {
-    io.emit("newMessage", text);
+  socket.on("text", (text, callback) => {
+    io.emit("Message", text);
+    callback();
   });
 
-  socket.on("Location", (location) => {
+  socket.on("Location", (location, callback) => {
     io.emit(
       "Message",
       `https://google.com/maps?q=${location.lat},${location.long}`
     );
+    callback();
   });
   socket.on("disconnect", () => {
     io.emit("Message", "A user has left the chat");
