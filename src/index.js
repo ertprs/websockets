@@ -17,6 +17,13 @@ io.on("connection", (socket) => {
   socket.on("text", (text) => {
     io.emit("newMessage", text);
   });
+
+  socket.on("Location", (location) => {
+    io.emit(
+      "Message",
+      `https://google.com/maps?q=${location.lat},${location.long}`
+    );
+  });
   socket.on("disconnect", () => {
     io.emit("Message", "A user has left the chat");
   });
