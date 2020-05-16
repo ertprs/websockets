@@ -9,6 +9,7 @@ const $message = document.querySelector("#message");
 
 // TEMPLATES
 const $messageTemplate = document.querySelector("#message-template").innerHTML;
+const $urlTemplate = document.querySelector("#url-template").innerHTML;
 
 // WELCOME MESSAGE FIRST AND SENDING MESSAGES TO USERS
 socket.on("Message", (message) => {
@@ -17,6 +18,12 @@ socket.on("Message", (message) => {
 
   $input.value = "";
   $input.focus();
+});
+
+// RENDERING LOCATION MESSAGE
+socket.on("LocationMessage", (url) => {
+  const urlHtml = Mustache.render($urlTemplate, { url });
+  $message.insertAdjacentHTML("beforeend", urlHtml);
 });
 
 // TARGETING THE INPUT FIELD AND DELIVERING MESSAGE
