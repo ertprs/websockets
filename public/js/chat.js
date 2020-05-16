@@ -13,7 +13,10 @@ const $urlTemplate = document.querySelector("#url-template").innerHTML;
 
 // WELCOME MESSAGE FIRST AND SENDING MESSAGES TO USERS
 socket.on("Message", (message) => {
-  const html = Mustache.render($messageTemplate, { message });
+  const html = Mustache.render($messageTemplate, {
+    message: message.text,
+    createdAt: moment(message.createdAt).format("h:mm a"),
+  });
   $message.insertAdjacentHTML("beforeend", html);
 
   $input.value = "";

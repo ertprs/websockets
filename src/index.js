@@ -3,6 +3,8 @@ const path = require("path");
 const express = require("express");
 const socketio = require("socket.io");
 
+const { generateMessage } = require("./utils/message");
+
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
@@ -12,10 +14,13 @@ app.use(express.static(path.join(__dirname, "../public")));
 let message = "Welcome";
 
 io.on("connection", (socket) => {
-  socket.emit("Message", message);
-  socket.broadcast.emit("Message", "A new user has joined the chat");
+  socket.emit("Message", generateMessage(message));
+  socket.broadcast.emit(
+    "Message",
+    generateMessage("A new user has joined the chat")
+  );
   socket.on("text", (text, callback) => {
-    io.emit("Message", text);
+    io.emit("Message", generateMessage(text));
     callback();
   });
 
@@ -27,7 +32,7 @@ io.on("connection", (socket) => {
     callback();
   });
   socket.on("disconnect", () => {
-    io.emit("Message", "A user has left the chat");
+    io.emit("Message", generateMessage("A user has left the chat"));
   });
 });
 
