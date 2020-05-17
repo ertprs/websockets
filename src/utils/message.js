@@ -6,10 +6,11 @@ const generateMessage = text => {
   };
 };
 
-const generateLocationMessage = location => {
+const generateLocationMessage = message => {
   return {
-    location,
-    createdAt: new Date().getTime()
+    location: message.location,
+    createdAt: new Date().getTime(),
+    username: message.username
   };
 };
 

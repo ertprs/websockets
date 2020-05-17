@@ -26,15 +26,15 @@ io.on("connection", socket => {
       return callback(error);
     }
     socket.join(user.room);
-    socket.emit(
-      "Message",
-      generateMessage({ message, username: user.username })
-    );
+    socket.emit("Message", generateMessage({ message, username: "Admin" }));
     socket.broadcast
       .to(user.room)
       .emit(
         "Message",
-        generateMessage({ message: `${user.username} has joined the chat` })
+        generateMessage({
+          message: `${user.username} has joined the chat`,
+          username: "Admin"
+        })
       );
     callback();
   });
@@ -46,11 +46,14 @@ io.on("connection", socket => {
   });
 
   socket.on("Location", (location, callback) => {
-    io.emit(
+    const user = getUser(socket.id);
+
+    io.to(user.room).emit(
       "LocationMessage",
-      generateLocationMessage(
-        `https://google.com/maps?q=${location.lat},${location.long}`
-      )
+      generateLocationMessage({
+        location: `https://google.com/maps?q=${location.lat},${location.long}`,
+        username: user.username
+      })
     );
     callback();
   });
@@ -60,7 +63,10 @@ io.on("connection", socket => {
     if (user) {
       io.to(user.room).emit(
         "Message",
-        generateMessage({ message: `${user.username} has left the chat` })
+        generateMessage({
+          message: `${user.username} has left the chat`,
+          username: "Admin"
+        })
       );
     }
   });

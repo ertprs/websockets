@@ -15,7 +15,6 @@ let $username;
 // WELCOME MESSAGE FIRST AND SENDING MESSAGES TO USERS
 socket.on("Message", message => {
   $username = message.username;
-  console.log(message);
   const html = Mustache.render($messageTemplate, {
     createdAt: moment(message.createdAt).format("h:mm a"),
     username: message.username,
@@ -31,7 +30,8 @@ socket.on("Message", message => {
 socket.on("LocationMessage", url => {
   const urlHtml = Mustache.render($urlTemplate, {
     url: url.location,
-    createdAt: moment(url.createdAt).format("h:mm a")
+    createdAt: moment(url.createdAt).format("h:mm a"),
+    username: url.username
   });
   $message.insertAdjacentHTML("beforeend", urlHtml);
 });
