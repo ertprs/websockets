@@ -4,6 +4,12 @@ const express = require("express");
 const socketio = require("socket.io");
 
 const { generateMessage, generateLocationMessage } = require("./utils/message");
+const {
+  getUser,
+  getUsersInRoom,
+  removeUser,
+  addUser
+} = require("./utils/user");
 
 const app = express();
 const server = http.createServer(app);
@@ -14,18 +20,28 @@ app.use(express.static(path.join(__dirname, "../public")));
 let message = "Welcome";
 io.on("connection", socket => {
   // LISTENING FOR THE NEW USER
-  socket.on("join", ({ username, room }) => {
-    socket.emit("Message", generateMessage({ message, username }));
+  socket.on("join", ({ username, room }, callback) => {
+    const { user, error } = addUser(socket.id, room, username);
+    if (error) {
+      return callback(error);
+    }
+    socket.join(user.room);
+    socket.emit(
+      "Message",
+      generateMessage({ message, username: user.username })
+    );
     socket.broadcast
-      .to(room)
+      .to(user.room)
       .emit(
         "Message",
-        generateMessage({ message: `user has joined the chat` })
+        generateMessage({ message: `${user.username} has joined the chat` })
       );
+    callback();
   });
 
   socket.on("text", ({ message, username }, callback) => {
-    io.emit("Message", generateMessage({ message, username }));
+    const user = getUser(socket.id);
+    io.to(user.room).emit("Message", generateMessage({ message, username }));
     callback();
   });
 
@@ -39,7 +55,14 @@ io.on("connection", socket => {
     callback();
   });
   socket.on("disconnect", () => {
-    io.emit("Message", generateMessage({ message: `user has left the chat` }));
+    const user = removeUser(socket.id);
+
+    if (user) {
+      io.to(user.room).emit(
+        "Message",
+        generateMessage({ message: `${user.username} has left the chat` })
+      );
+    }
   });
 });
 

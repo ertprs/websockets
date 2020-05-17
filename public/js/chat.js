@@ -71,8 +71,9 @@ $locationButton.addEventListener("click", event => {
 const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true
 });
-socket.emit("join", { username, room });
-
-socket.on("test", message => {
-  console.log(message);
+socket.emit("join", { username, room }, error => {
+  if (error) {
+    alert(error);
+    location.href = "/";
+  }
 });
