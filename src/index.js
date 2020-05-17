@@ -3,7 +3,7 @@ const path = require("path");
 const express = require("express");
 const socketio = require("socket.io");
 
-const { generateMessage } = require("./utils/message");
+const { generateMessage, generateLocationMessage } = require("./utils/message");
 
 const app = express();
 const server = http.createServer(app);
@@ -27,7 +27,9 @@ io.on("connection", (socket) => {
   socket.on("Location", (location, callback) => {
     io.emit(
       "LocationMessage",
-      `https://google.com/maps?q=${location.lat},${location.long}`
+      generateLocationMessage(
+        `https://google.com/maps?q=${location.lat},${location.long}`
+      )
     );
     callback();
   });
