@@ -12,15 +12,20 @@ const io = socketio(server);
 app.use(express.static(path.join(__dirname, "../public")));
 
 let message = "Welcome";
+io.on("connection", socket => {
+  // LISTENING FOR THE NEW USER
+  socket.on("join", ({ username, room }) => {
+    socket.emit("Message", generateMessage({ message, username }));
+    socket.broadcast
+      .to(room)
+      .emit(
+        "Message",
+        generateMessage({ message: `user has joined the chat` })
+      );
+  });
 
-io.on("connection", (socket) => {
-  socket.emit("Message", generateMessage(message));
-  socket.broadcast.emit(
-    "Message",
-    generateMessage("A new user has joined the chat")
-  );
-  socket.on("text", (text, callback) => {
-    io.emit("Message", generateMessage(text));
+  socket.on("text", ({ message, username }, callback) => {
+    io.emit("Message", generateMessage({ message, username }));
     callback();
   });
 
@@ -34,7 +39,7 @@ io.on("connection", (socket) => {
     callback();
   });
   socket.on("disconnect", () => {
-    io.emit("Message", generateMessage("A user has left the chat"));
+    io.emit("Message", generateMessage({ message: `user has left the chat` }));
   });
 });
 
