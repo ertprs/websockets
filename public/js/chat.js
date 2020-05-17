@@ -6,15 +6,15 @@ const $formBtn = document.querySelector("#formBtn");
 const $input = document.querySelector("#text");
 const $locationButton = document.querySelector("#location");
 const $message = document.querySelector("#message");
+const $sidebar = document.querySelector("#sidebar");
 
 // TEMPLATES
 const $messageTemplate = document.querySelector("#message-template").innerHTML;
 const $urlTemplate = document.querySelector("#url-template").innerHTML;
+const $sidebarTemplate = document.querySelector("#sidebar-template").innerHTML;
 
-let $username;
 // WELCOME MESSAGE FIRST AND SENDING MESSAGES TO USERS
 socket.on("Message", message => {
-  $username = message.username;
   const html = Mustache.render($messageTemplate, {
     createdAt: moment(message.createdAt).format("h:mm a"),
     username: message.username,
@@ -34,6 +34,15 @@ socket.on("LocationMessage", url => {
     username: url.username
   });
   $message.insertAdjacentHTML("beforeend", urlHtml);
+});
+
+// LISTENING TO THE USER JOINING AND USER LEAVING THE CHAT ROOM
+socket.on("roomData", ({ room, users }) => {
+  const html = Mustache.render($sidebarTemplate, {
+    room,
+    users
+  });
+  $sidebar.innerHTML = html;
 });
 
 // TARGETING THE INPUT FIELD AND DELIVERING MESSAGE

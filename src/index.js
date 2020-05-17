@@ -26,16 +26,18 @@ io.on("connection", socket => {
       return callback(error);
     }
     socket.join(user.room);
+    socket.emit("roomData", {
+      room: user.room,
+      users: getUsersInRoom(user.room)
+    });
     socket.emit("Message", generateMessage({ message, username: "Admin" }));
-    socket.broadcast
-      .to(user.room)
-      .emit(
-        "Message",
-        generateMessage({
-          message: `${user.username} has joined the chat`,
-          username: "Admin"
-        })
-      );
+    socket.broadcast.to(user.room).emit(
+      "Message",
+      generateMessage({
+        message: `${user.username} has joined the chat`,
+        username: "Admin"
+      })
+    );
     callback();
   });
 
