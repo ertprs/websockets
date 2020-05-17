@@ -13,6 +13,31 @@ const $messageTemplate = document.querySelector("#message-template").innerHTML;
 const $urlTemplate = document.querySelector("#url-template").innerHTML;
 const $sidebarTemplate = document.querySelector("#sidebar-template").innerHTML;
 
+//AUTO SCROLLING
+const autoScrolling = () => {
+  // NEW MESSAGE ELEMENT
+  const $newMessage = $message.lastElementChild;
+
+  // HEIGHT OF THE NEW MESSAGE
+  const newMessageStyles = getComputedStyle($newMessage);
+  const newMessageMargin = parseInt(newMessageStyles.marginBottom);
+  const newMessageHeight = $newMessage.offsetHeight + newMessageMargin;
+
+  // VISIBLE HEIGHT
+  const visibleHeight = $message.offsetHeight;
+
+  // HEIGHT OF MESSAGES CONTAINER
+  const containerHeight = $message.scrollHeight;
+
+  // HOW FAR I HAVE SCROLLED
+  const scrollOffset = $message.scrollTop + visibleHeight;
+
+  // CHECK IF AT THE BOTTOM
+  if (containerHeight - newMessageHeight <= scrollOffset) {
+    $message.scrollTop = $message.scrollHeight;
+  }
+};
+
 // WELCOME MESSAGE FIRST AND SENDING MESSAGES TO USERS
 socket.on("Message", message => {
   const html = Mustache.render($messageTemplate, {
@@ -24,6 +49,7 @@ socket.on("Message", message => {
 
   $input.value = "";
   $input.focus();
+  autoScrolling();
 });
 
 // RENDERING LOCATION MESSAGE
@@ -34,6 +60,7 @@ socket.on("LocationMessage", url => {
     username: url.username
   });
   $message.insertAdjacentHTML("beforeend", urlHtml);
+  autoScrolling();
 });
 
 // LISTENING TO THE USER JOINING AND USER LEAVING THE CHAT ROOM
